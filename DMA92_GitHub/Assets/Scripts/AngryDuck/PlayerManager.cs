@@ -16,6 +16,7 @@ public class PlayerManager : MonoBehaviour
     CharacterController currentCharacter;
     bool isHolding = false;
 
+    public Transform collectedItemsTransform;
     private void Start()
     {
         foreach (var character in allMyCharacters)
@@ -23,13 +24,23 @@ public class PlayerManager : MonoBehaviour
 
             character.OnCharacterRelease += CharacterRelease;
             character.OnCharacterDrag += CharacterDrag;
+            character.OnCollected += CollectedItem;
 
+        }
+    }
+
+    private void CollectedItem(GameObject obj)
+    {
+        if (obj != null)
+        {
+            obj.transform.parent = collectedItemsTransform;
+            obj.transform.localPosition = Vector3.zero;
         }
     }
 
     private void CharacterDrag(CharacterController obj)
     {
-        if (obj.hasBeenThrown)
+        if (obj.hasBeenThrown == true)
             return;
         if (isHolding == false)
         {
@@ -63,9 +74,10 @@ public class PlayerManager : MonoBehaviour
 
     private void CharacterRelease(CharacterController obj)
     {
-        if (obj.hasBeenThrown)
+        if (obj.hasBeenThrown == true)
             return;
         currentCharacter.rb2d.bodyType = RigidbodyType2D.Dynamic;
+   
         ThrowCharacter(obj);
         isHolding = false;
 
