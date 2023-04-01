@@ -18,7 +18,9 @@ public class AIBrains_TDS : MonoBehaviour
     public Vector2 secondsRangeIdle = new Vector2(6f, 8f);
     private float idleSeconds;
     bool foundIdlePoint = false;
+    Vector3 currPoint;
 
+    [SerializeField] private Animator animator;
     /// <summary>
     /// Idle: Will have an idle animation and may walk a couple of steps in an assigned area.
     /// Go to roam or patrol after x seconds if is on idle
@@ -79,12 +81,16 @@ public class AIBrains_TDS : MonoBehaviour
 
     private void IdleUpdate()
     {
+
+        // Find a point and go to it. 
+        //once reached wait for seconds
+        //repeat
         Vector3 randPoint = FindPointInArea();
 
         if (!foundIdlePoint && randPoint != Vector3.zero)
         {
 
-
+            currPoint = randPoint;
             agent.SetDestination(randPoint);
             foundIdlePoint = true;
 
@@ -92,6 +98,7 @@ public class AIBrains_TDS : MonoBehaviour
 
         if (foundIdlePoint) // Start counting down
         {
+
             idleSeconds -= Time.deltaTime;
 
             if (idleSeconds < 0)
@@ -100,9 +107,20 @@ public class AIBrains_TDS : MonoBehaviour
                 idleSeconds = Random.Range(secondsRangeIdle.x, secondsRangeIdle.y);
             }
         }
-        // Find a point and go to it. 
-        //once reached wait for seconds
-        //repeat
+
+        //Debug.Log(agent.transform.position);
+        //Debug.Log(currPoint);
+        //Debug.Log(agent.pathStatus);
+        if (Vector2.Distance(new Vector2(agent.transform.position.x, agent.transform.position.z),
+            new Vector2(currPoint.x, currPoint.z)) <= .5f)
+        {
+            animator.SetTrigger("Idle");
+        }
+        else
+        {
+            animator.SetTrigger("Run");
+        }
+
 
     }
 
@@ -136,7 +154,7 @@ public class AIBrains_TDS : MonoBehaviour
             result = Vector3.zero;
 
         }
-       
+
         return result;
     }
 
@@ -145,6 +163,6 @@ public class AIBrains_TDS : MonoBehaviour
     {
         // Draw a yellow sphere at the transform's position
         Gizmos.color = Color.yellow;
-        Gizmos.DrawSphere(transform.position, idleR);
+        Gizmos.DrawWireSphere(transform.position, idleR);
     }
 }
