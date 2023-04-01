@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CharacterController : MonoBehaviour
+public class CharacterControllerDuck : MonoBehaviour
 {
 
 
@@ -12,8 +12,8 @@ public class CharacterController : MonoBehaviour
     public Collider2D[] myCols;
 
 
-    public Action<CharacterController> OnCharacterRelease;
-    public Action<CharacterController> OnCharacterDrag;
+    public Action<CharacterControllerDuck> OnCharacterRelease;
+    public Action<CharacterControllerDuck> OnCharacterDrag;
     public Action<GameObject> OnCollected;
 
 

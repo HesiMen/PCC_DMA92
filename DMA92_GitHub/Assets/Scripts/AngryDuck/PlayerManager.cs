@@ -11,9 +11,9 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private float _ForceAdded = 200f;
     private Vector3 _MousePos;
 
-    [SerializeField] CharacterController[] allMyCharacters;
+    [SerializeField] CharacterControllerDuck[] allMyCharacters;
 
-    CharacterController currentCharacter;
+    CharacterControllerDuck currentCharacter;
     bool isHolding = false;
 
     public Transform collectedItemsTransform;
@@ -38,7 +38,7 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    private void CharacterDrag(CharacterController obj)
+    private void CharacterDrag(CharacterControllerDuck obj)
     {
         if (obj.hasBeenThrown == true)
             return;
@@ -72,7 +72,7 @@ public class PlayerManager : MonoBehaviour
 
     }
 
-    private void CharacterRelease(CharacterController obj)
+    private void CharacterRelease(CharacterControllerDuck obj)
     {
         if (obj.hasBeenThrown == true)
             return;
@@ -98,7 +98,7 @@ public class PlayerManager : MonoBehaviour
 
 
 
-    private void ThrowCharacter(CharacterController character)
+    private void ThrowCharacter(CharacterControllerDuck character)
     {
         Vector3 direction = _MousePos - anchor.position;
         character.rb2d.AddForce(-direction * _ForceAdded);
