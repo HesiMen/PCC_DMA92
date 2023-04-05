@@ -19,7 +19,10 @@ public class AIBrains_TDS : MonoBehaviour
     private float idleSeconds;
     bool foundIdlePoint = false;
     Vector3 currPoint;
+    public float chaseRadius = 4f;
 
+    public float fOffsetChase = 0f;
+    Vector3 possiblePlayerPos = Vector3.zero;
     [SerializeField] private Animator animator;
     /// <summary>
     /// Idle: Will have an idle animation and may walk a couple of steps in an assigned area.
@@ -52,6 +55,18 @@ public class AIBrains_TDS : MonoBehaviour
 
     private void StateUpdate()
     {
+        possiblePlayerPos = CheckNearbyPlayer();
+
+        if (Vector2.Distance(new Vector2(agent.transform.position.x, agent.transform.position.z),
+            new Vector2(currPoint.x, currPoint.z)) <= .5f)
+        {
+            animator.SetTrigger("Idle");
+        }
+        else
+        {
+            animator.SetTrigger("Run");
+        }
+
         switch (currentState)
         {
             case AIStates.Idle:
@@ -111,15 +126,7 @@ public class AIBrains_TDS : MonoBehaviour
         //Debug.Log(agent.transform.position);
         //Debug.Log(currPoint);
         //Debug.Log(agent.pathStatus);
-        if (Vector2.Distance(new Vector2(agent.transform.position.x, agent.transform.position.z),
-            new Vector2(currPoint.x, currPoint.z)) <= .5f)
-        {
-            animator.SetTrigger("Idle");
-        }
-        else
-        {
-            animator.SetTrigger("Run");
-        }
+        
 
 
     }
@@ -137,6 +144,37 @@ public class AIBrains_TDS : MonoBehaviour
     private void ChaseUpdate()
     {
 
+        if (possiblePlayerPos != Vector3.zero)
+        {
+            NavMeshHit hit;
+           if(NavMesh.SamplePosition(possiblePlayerPos, out hit, 2.0f, NavMesh.AllAreas))
+            {
+                agent.SetDestination(hit.position);
+            }
+        }
+
+    }
+
+    private Vector3 CheckNearbyPlayer()
+    {
+      
+
+        int maxColliders = 10;
+        Collider[] hitColliders = new Collider[maxColliders];
+        int numColliders = Physics.OverlapSphereNonAlloc(agent.transform.position + agent.transform.forward * fOffsetChase, chaseRadius, hitColliders);
+        for (int i = 0; i < numColliders; i++)
+        {
+            if (hitColliders[i].GetComponent<PlayerController>() != null)
+            {
+                Debug.DrawLine(agent.transform.position, hitColliders[i].transform.position, Color.red);
+                currentState = AIStates.Chase;
+                return hitColliders[i].transform.position;
+            }
+
+        }
+
+        currentState = AIStates.Idle;
+        return Vector3.zero;
     }
 
     private Vector3 FindPointInArea()
@@ -147,7 +185,7 @@ public class AIBrains_TDS : MonoBehaviour
         if (NavMesh.SamplePosition(randomPoint, out hit, 1.0f, NavMesh.AllAreas))
         {
             result = hit.position;
-            Debug.DrawLine(agent.transform.position, result, Color.red);
+            //Debug.DrawLine(agent.transform.position, result, Color.red);
         }
         else
         {
@@ -164,5 +202,10 @@ public class AIBrains_TDS : MonoBehaviour
         // Draw a yellow sphere at the transform's position
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, idleR);
+
+
+        Gizmos.color = currentState == AIStates.Chase ? Color.red:Color.green;
+        Gizmos.DrawWireSphere(agent.transform.position + agent.transform.forward * fOffsetChase, chaseRadius);
+
     }
 }
