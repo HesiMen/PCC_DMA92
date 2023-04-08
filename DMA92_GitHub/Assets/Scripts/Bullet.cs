@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using DG.Tweening;
 public class Bullet : MonoBehaviour
 {
     public Rigidbody rb;
@@ -16,6 +16,9 @@ public class Bullet : MonoBehaviour
     IEnumerator LifeBulletRoutine()
     {
         currSeconds = lifeSeconds;
+        transform.DOShakeRotation(lifeSeconds);
+        transform.localScale = Vector3.one * .073f;
+        transform.DOShakeScale(lifeSeconds);
         while (gameObject.activeSelf)
         {
             currSeconds -= Time.deltaTime;
